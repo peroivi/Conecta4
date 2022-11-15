@@ -14,22 +14,20 @@ public class citroënC4 implements Jugador, IAuto{
     private String nom;
     private int color=1;
     private int prof;
-    private boolean primerMove;
-    private int contaNodes;
-    private final ArrayList<int[]> direcciones;
+    public int[][] taula_posibilitat = {
+        {3, 4, 5, 7, 7, 5, 4, 3},
+        {4, 6, 8,10,10, 8, 6, 4},
+        {5, 8,11,13,13,11, 8, 5},
+        {7,10,13,16,16,13,10, 7},
+        {7,10,13,16,16,13,10, 7},
+        {5, 8,11,13,13,11, 8, 5},
+        {4, 6, 8,10,10, 8, 6, 4},
+        {3, 4, 5, 7, 7, 5, 4, 3}
+    };
     
     public citroënC4(int prof) {
         this.nom = "citroënC4";
-        this.prof = prof;
-        this.contaNodes = 0;
-        this.primerMove = true;
-        
-        this.direcciones = new ArrayList<>();
-        direcciones.add(new int[] { 1, 0 });
-        direcciones.add(new int[] { 1, 1 });
-        direcciones.add(new int[] { 0, 1 });
-        direcciones.add(new int[] { -1, 1 });
-        direcciones.add(new int[] { -1, 0 });
+        this.prof = prof;        
       }
     
     @Override
@@ -45,7 +43,7 @@ public class citroënC4 implements Jugador, IAuto{
     }
      
     public int nova_tirada(Tauler t, int profunditat) {
-        int mejorHeur = Integer.MIN_VALUE;
+        int millor_heur = Integer.MIN_VALUE;
         int millor_columna = -1;
         for (int i = 0; i < t.getMida(); i++) {
             int alpha = Integer.MIN_VALUE;
@@ -53,10 +51,10 @@ public class citroënC4 implements Jugador, IAuto{
                 Tauler tauler_aux = new Tauler(t);
                 tauler_aux.afegeix(i, this.color);
                 if (!tauler_aux.solucio(i, this.color)) {
-                    alpha = minimitza(tauler_aux,i, profunditat - 1, mejorHeur, Integer.MAX_VALUE);
-                    if (alpha > mejorHeur || millor_columna == -1) {
+                    alpha = minimitza(tauler_aux,i, profunditat - 1, millor_heur, Integer.MAX_VALUE);
+                    if (alpha > millor_heur || millor_columna == -1) {
                         millor_columna = i;
-                        mejorHeur = alpha;
+                        millor_heur = alpha;
                     }
                 }
                 else {
@@ -115,72 +113,87 @@ public class citroënC4 implements Jugador, IAuto{
         return nuevaBeta;
     }
     
-    
-    //-----------------------------------------------------------------------------------------
-    
-     protected int largo (Tauler t, int i, int j, int direccionX, int direccionY, int color) {
-        int size = t.getMida();
-        int score = 0;
-        for (int k = 0; k < 4; k++) {
-            i += direccionX;
-            j += direccionY;
-            if (i < 0 || i >= size || j < 0 || j >= size) {
-                break;
-            }
-            int colorPos = t.getColor(i, j);
-            if (colorPos == 0) {
-                score += 3;
+        
+    public int puntua (Tauler t, int i, int j, int color) {
+        int puntuacio = 0;
+        if (t.getColor(i, j) != 0) {
+            if (t.getColor(i, j) == color) {
+                puntuacio += 3;                    
             }
             else {
-                if (colorPos == color) {
-                    score += 2;                    
-                }
-                else {
-                    score -= 1;
-                }
+                puntuacio -= 1;
             }
         }
-        return score;
+        return puntuacio;
     }
     
-     /**
-     * Metodo que calcula la heurística de un tablero entero. Para calcular la heurística, 
-     * comprueva todas las fichas del tablero y le da prioridad aquellas fichas que esten
-     * juntas. 
-     * 
-     * @param t es el tablero que esta actualmente en la partida.
-     * 
-     * @return puntos que indica cual de buena es la jugada que se está planteando. 
-     * 
-     * @see largo(Tauler t, int i, int j, int direccionX, int direccionY, int color) 
-     */
-    protected int heur(Tauler t) {
-
-        
-        int puntosYo = 0;
-        int puntosEnemigo = 0;
+    public int heur(Tauler t) {
+        int puntuacio_meva = 0;
+        int puntuacio_enemic = 0;
         int size = t.getMida();
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (t.getColor(i, j) == this.color) {
-                    for (int[] direc : direcciones) {
-                        int dirX = direc[0];
-                        int dirY = direc[1];
-                        int puntos = largo(t, i, j, dirX, dirY, this.color);
-                        puntosYo += puntos;
-                    }
+                    puntuacio_meva += taula_posibilitat[i][j];
+                } else if (t.getColor(i, j) == this.color*-1) {
+                    puntuacio_enemic += taula_posibilitat[i][j];
+                }
+                if (t.getColor(i, j) == this.color) {
+                    int hor = puntuacio_horitzontal(t,i,j,this.color);
+                    int ver = puntuacio_vertical(t,i,j,this.color);
+                    int diag = puntuacio_diagonal(t,i,j,this.color);
+                    puntuacio_meva += hor+ver+diag;
                 }
                 else if (t.getColor(i, j) == this.color*-1) {
-                    for (int[] direc : direcciones) {
-                        int dirX = direc[0];
-                        int dirY = direc[1];
-                        int puntos = largo(t, i, j, dirX, dirY, this.color*-1);
-                        puntosEnemigo += puntos;
-                    }
+                    int hor = puntuacio_horitzontal(t,i,j,this.color*-1);
+                    int ver = puntuacio_vertical(t,i,j,this.color*-1);
+                    int diag = puntuacio_diagonal(t,i,j,this.color*-1);
+                    puntuacio_enemic += hor+ver+diag;  
                 }
             }
         }
-        return puntosYo - puntosEnemigo;
+        return puntuacio_meva - puntuacio_enemic;
+    }
+    
+    public int puntuacio_horitzontal(Tauler t, int i, int j, int color){
+        int puntuacio = 0;
+        int size = t.getMida();
+        for (int x = 0; x < 4; x++) {
+            if (i-x < 0 || i+x >= size || j-x < 0 || j+x >= size) {
+                break;
+            }
+            int esq = puntua(t,i-x,j,color);
+            int dre = puntua(t,i+x,j,color);
+            puntuacio += esq + dre;
+        }
+        return puntuacio;
+    }
+    
+    public int puntuacio_vertical(Tauler t, int i, int j, int color){
+        int puntuacio = 0;
+        int size = t.getMida();
+        for (int x = 0; x < 4; x++) {
+            if (i-x < 0 || i+x >= size || j-x < 0 || j+x >= size) {
+                break;
+            }
+            int punt = puntua(t,i,j+x,color);
+            puntuacio += punt;
+        }
+        return puntuacio;
+    }
+    
+    public int puntuacio_diagonal(Tauler t, int i, int j, int color){
+        int puntuacio = 0;
+        int size = t.getMida();
+        for (int x = 0; x < 4; x++) {
+            if (i-x < 0 || i+x >= size || j-x < 0 || j+x >= size) {
+                break;
+            }
+            int esq = puntua(t,i-x,j+x,color);
+            int dre = puntua(t,i+x,j+x,color);
+            puntuacio += esq + dre;
+        }
+        return puntuacio;
     }
 }
 
