@@ -51,6 +51,10 @@ public class citroënC4 implements Jugador, IAuto{
                 Tauler tauler_aux = new Tauler(t);
                 tauler_aux.afegeix(i, this.color);
                 if (!tauler_aux.solucio(i, this.color)) {
+                    //Descomentar si es vol sense poda
+                    //alpha = minimitza(tauler_aux,i, profunditat - 1);
+                    
+                    //Comentar si es vol sense poda
                     alpha = minimitza(tauler_aux,i, profunditat - 1, millor_heur, Integer.MAX_VALUE);
                     if (alpha > millor_heur || millor_columna == -1) {
                         millor_columna = i;
@@ -64,53 +68,68 @@ public class citroënC4 implements Jugador, IAuto{
          }
         return millor_columna;
     }
+    //Descomentar si es vol sense poda
+    //public int maximitza (Tauler t, int columna ,int profunditat){
     
+    //Comentar si es vol sense poda
     public int maximitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
         if (profunditat <= 0) {
             return heur(t);
         }
-        int nuevaAlfa = Integer.MIN_VALUE;
+        int nova_alpha = Integer.MIN_VALUE;
         for (int i = 0; i < t.getMida(); i++) {
             if (t.movpossible(i)) {
                 Tauler taulell_aux = new Tauler(t);
                 taulell_aux.afegeix(i, this.color);
                 if (!taulell_aux.solucio(i, this.color)) {
-                    nuevaAlfa = Math.max(nuevaAlfa, minimitza(taulell_aux,i, profunditat - 1, alpha, beta));
-                    alpha = Math.max(nuevaAlfa, alpha);
+                    //Descomentar si es vol sense poda
+                    //nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux,i, profunditat - 1));
+                    
+                    //---Comentar si es vol sense poda-----------------
+                    nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux,i, profunditat - 1, alpha, beta));
+                    alpha = Math.max(nova_alpha, alpha);
                     if (alpha >= beta) {
                         return alpha;
                     }
+                    //-------------------------------------------------
                 }
                 else {
                     return Integer.MAX_VALUE;
                 }
             }
         }
-        return nuevaAlfa;
+        return nova_alpha;
     }
-    
+    //Descomentar si es vol sense poda
+    //public int minimitza (Tauler t, int columna ,int profunditat){
+    //Comentar si es vol sense poda
     public int minimitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
         if (profunditat <= 0) {
             return heur(t);
         }
-        int nuevaBeta = Integer.MAX_VALUE;
+        int nova_beta = Integer.MAX_VALUE;
         for (int i = 0; i < t.getMida(); i++) {
             if (t.movpossible(i)) {
                 Tauler taulell_aux = new Tauler(t);
                 taulell_aux.afegeix(i, this.color*-1);
                 if (!taulell_aux.solucio(i, this.color*-1)) {
-                    nuevaBeta = Math.min(nuevaBeta, maximitza(taulell_aux,i, profunditat - 1, alpha, beta));
-                    beta = Math.min(nuevaBeta, beta);
+                    //Descomentar si es vol sense poda
+                    //nova_beta = Math.min(nova_beta, maximitza(taulell_aux,i, profunditat - 1));
+                    
+                    //---Comentar si es vol sense poda-----------------
+                    nova_beta = Math.min(nova_beta, maximitza(taulell_aux,i, profunditat - 1, alpha, beta));
+                    beta = Math.min(nova_beta, beta);
                     if (alpha >= beta) {
                         return beta;
                     }
+                    //-------------------------------------------------
                 }
                 else {
                     return Integer.MIN_VALUE;
                 }
             }
         }
-        return nuevaBeta;
+        return nova_beta;
     }
     
         
@@ -118,10 +137,10 @@ public class citroënC4 implements Jugador, IAuto{
         int puntuacio = 0;
         if (t.getColor(i, j) != 0) {
             if (t.getColor(i, j) == color) {
-                puntuacio += 3;                    
+                puntuacio = taula_posibilitat[i][j];                
             }
             else {
-                puntuacio -= 1;
+                puntuacio = -1;
             }
         }
         return puntuacio;
