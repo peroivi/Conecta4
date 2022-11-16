@@ -14,6 +14,8 @@ public class citroënC4 implements Jugador, IAuto{
     private String nom;
     private int color=1;
     private int prof;
+    private int numNodes;
+    
     public int[][] taula_posibilitat = {
         {3, 4, 5, 7, 7, 5, 4, 3},
         {4, 6, 8,10,10, 8, 6, 4},
@@ -27,7 +29,8 @@ public class citroënC4 implements Jugador, IAuto{
     
     public citroënC4(int prof) {
         this.nom = "citroënC4";
-        this.prof = prof;        
+        this.prof = prof;    
+        numNodes = 0;
       }
     
     @Override
@@ -39,6 +42,7 @@ public class citroënC4 implements Jugador, IAuto{
     public int moviment(Tauler t, int color) {
         this.color = color;
         int tirada = nova_tirada(t,prof);
+        System.out.println("Nodes total = "+ numNodes);
         return tirada;
     }
      
@@ -52,10 +56,10 @@ public class citroënC4 implements Jugador, IAuto{
                 tauler_aux.afegeix(i, this.color);
                 if (!tauler_aux.solucio(i, this.color)) {
                     //Descomentar si es vol sense poda
-                    //alpha = minimitza(tauler_aux,i, profunditat - 1);
+                    alpha = minimitza(tauler_aux,i, profunditat - 1);
                     
                     //Comentar si es vol sense poda
-                    alpha = minimitza(tauler_aux,i, profunditat - 1, millor_heur, Integer.MAX_VALUE);
+                    //alpha = minimitza(tauler_aux,i, profunditat - 1, millor_heur, Integer.MAX_VALUE);
                     if (alpha > millor_heur || millor_columna == -1) {
                         millor_columna = i;
                         millor_heur = alpha;
@@ -69,10 +73,10 @@ public class citroënC4 implements Jugador, IAuto{
         return millor_columna;
     }
     //Descomentar si es vol sense poda
-    //public int maximitza (Tauler t, int columna ,int profunditat){
+    public int maximitza (Tauler t, int columna ,int profunditat){
     
     //Comentar si es vol sense poda
-    public int maximitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
+    //public int maximitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
         if (profunditat <= 0) {
             return heur(t);
         }
@@ -83,14 +87,16 @@ public class citroënC4 implements Jugador, IAuto{
                 taulell_aux.afegeix(i, this.color);
                 if (!taulell_aux.solucio(i, this.color)) {
                     //Descomentar si es vol sense poda
-                    //nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux,i, profunditat - 1));
+                    nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux,i, profunditat - 1));
                     
                     //---Comentar si es vol sense poda-----------------
+                    /*
                     nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux,i, profunditat - 1, alpha, beta));
                     alpha = Math.max(nova_alpha, alpha);
                     if (alpha >= beta) {
                         return alpha;
                     }
+*/
                     //-------------------------------------------------
                 }
                 else {
@@ -101,9 +107,9 @@ public class citroënC4 implements Jugador, IAuto{
         return nova_alpha;
     }
     //Descomentar si es vol sense poda
-    //public int minimitza (Tauler t, int columna ,int profunditat){
+    public int minimitza (Tauler t, int columna ,int profunditat){
     //Comentar si es vol sense poda
-    public int minimitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
+    //public int minimitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
         if (profunditat <= 0) {
             return heur(t);
         }
@@ -114,14 +120,16 @@ public class citroënC4 implements Jugador, IAuto{
                 taulell_aux.afegeix(i, this.color*-1);
                 if (!taulell_aux.solucio(i, this.color*-1)) {
                     //Descomentar si es vol sense poda
-                    //nova_beta = Math.min(nova_beta, maximitza(taulell_aux,i, profunditat - 1));
+                    nova_beta = Math.min(nova_beta, maximitza(taulell_aux,i, profunditat - 1));
                     
                     //---Comentar si es vol sense poda-----------------
+                    /*
                     nova_beta = Math.min(nova_beta, maximitza(taulell_aux,i, profunditat - 1, alpha, beta));
                     beta = Math.min(nova_beta, beta);
                     if (alpha >= beta) {
                         return beta;
                     }
+*/
                     //-------------------------------------------------
                 }
                 else {
@@ -147,6 +155,7 @@ public class citroënC4 implements Jugador, IAuto{
     }
     
     public int heur(Tauler t) {
+        numNodes = numNodes + 1;
         int puntuacio_meva = 0;
         int puntuacio_enemic = 0;
         int size = t.getMida();
