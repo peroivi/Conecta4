@@ -137,7 +137,7 @@ public class citroënC4 implements Jugador, IAuto{
         int puntuacio = 0;
         if (t.getColor(i, j) != 0) {
             if (t.getColor(i, j) == color) {
-                puntuacio = taula_posibilitat[i][j];                
+                puntuacio = 3;                
             }
             else {
                 puntuacio = -1;
@@ -178,12 +178,11 @@ public class citroënC4 implements Jugador, IAuto{
         int puntuacio = 0;
         int size = t.getMida();
         for (int x = 0; x < 4; x++) {
-            if (i-x < 0 || i+x >= size || j-x < 0 || j+x >= size) {
-                break;
+            if (i-x > 0 && i+x < size && j-x > 0 && j+x < size) {
+                int esq = puntua(t,i-x,j,color);
+                int dre = puntua(t,i+x,j,color);
+                puntuacio += esq + dre;
             }
-            int esq = puntua(t,i-x,j,color);
-            int dre = puntua(t,i+x,j,color);
-            puntuacio += esq + dre;
         }
         return puntuacio;
     }
@@ -192,11 +191,11 @@ public class citroënC4 implements Jugador, IAuto{
         int puntuacio = 0;
         int size = t.getMida();
         for (int x = 0; x < 4; x++) {
-            if (i-x < 0 || i+x >= size || j-x < 0 || j+x >= size) {
-                break;
+            if (i-x > 0 && i+x < size && j-x > 0 && j+x < size) {
+                int punt = puntua(t,i,j+x,color);
+                puntuacio += punt;
             }
-            int punt = puntua(t,i,j+x,color);
-            puntuacio += punt;
+            
         }
         return puntuacio;
     }
@@ -205,12 +204,12 @@ public class citroënC4 implements Jugador, IAuto{
         int puntuacio = 0;
         int size = t.getMida();
         for (int x = 0; x < 4; x++) {
-            if (i-x < 0 || i+x >= size || j-x < 0 || j+x >= size) {
-                break;
+            if (i-x > 0 && i+x < size && j-x > 0 && j+x < size) {
+                int esq = puntua(t,i-x,j+x,color);
+                int dre = puntua(t,i+x,j+x,color);
+                puntuacio += esq + dre;
             }
-            int esq = puntua(t,i-x,j+x,color);
-            int dre = puntua(t,i+x,j+x,color);
-            puntuacio += esq + dre;
+            
         }
         return puntuacio;
     }
