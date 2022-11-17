@@ -145,10 +145,12 @@ public class citroënC4 implements Jugador, IAuto{
         int puntuacio = 0;
         if (t.getColor(i, j) != 0) {
             if (t.getColor(i, j) == color) {
-                puntuacio = taula_posibilitat[i][j];                
+                if (this.prof > 4)
+                    puntuacio = 3;                
             }
             else {
-                puntuacio = -1;
+                if (this.prof > 4)
+                    puntuacio = -1;
             }
         }
         return puntuacio;
