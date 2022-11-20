@@ -8,7 +8,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author Usuario
+ * @author Pere Roca i Villanueva , Xavier Bermejo Sotillo 
  */
 public class citroënC4 implements Jugador, IAuto{
     private String nom;
@@ -27,17 +27,31 @@ public class citroënC4 implements Jugador, IAuto{
         {3, 4, 5, 7, 7, 5, 4, 3}
     };
     
+    /**
+     * Constructor del millor coche del mon
+     * @param prof profunditat maxima a la que s'explorarà
+     */
     public citroënC4(int prof) {
         this.nom = "citroënC4";
         this.prof = prof;    
         numNodes = 0;
       }
     
+    /**
+     * Funcio per saber el nom del jugador
+     * @return el nom del jugador
+     */
     @Override
     public String nom() {
         return nom;
     }
     
+    /**
+     * Funcio que indica el proxim moviment que farem
+     * @param t taulell sobre el que es juga
+     * @param color color que fa la tirada
+     * @return retorna la columna on s'ha de fer la tirada
+     */
     @Override
     public int moviment(Tauler t, int color) {
         this.color = color;
@@ -46,6 +60,12 @@ public class citroënC4 implements Jugador, IAuto{
         return tirada;
     }
      
+    /**
+     * Funcion que indica la millor tirada que podem fer segons la nostre heuristica
+     * @param t taulell sobre el que es juga
+     * @param profunditat profunditat maxima a la que s'explorara
+     * @return retorna la millor columna on fer la proxima tirada
+     */
     public int nova_tirada(Tauler t, int profunditat) {
         int millor_heur = Integer.MIN_VALUE;
         int millor_columna = -1;
@@ -56,10 +76,11 @@ public class citroënC4 implements Jugador, IAuto{
                 tauler_aux.afegeix(i, this.color);
                 if (!tauler_aux.solucio(i, this.color)) {
                     //Descomentar si es vol sense poda
-                    alpha = minimitza(tauler_aux,i, profunditat - 1);
+                    //alpha = minimitza(tauler_aux, profunditat - 1);
                     
                     //Comentar si es vol sense poda
-                    //alpha = minimitza(tauler_aux,i, profunditat - 1, millor_heur, Integer.MAX_VALUE);
+                    alpha = minimitza(tauler_aux, profunditat - 1, millor_heur, Integer.MAX_VALUE);
+                    
                     if (alpha > millor_heur || millor_columna == -1) {
                         millor_columna = i;
                         millor_heur = alpha;
@@ -72,14 +93,26 @@ public class citroënC4 implements Jugador, IAuto{
          }
         return millor_columna;
     }
-    //Descomentar si es vol sense poda
-    public int maximitza (Tauler t, int columna ,int profunditat){
     
+
+    
+    /**
+     * Funcion que ens indica l'heuristica mes gran trobada per totes les tirades analitzades.
+     * @param t taulell sobre el que s'esta jugant
+     * @param profunditat profunditat fins la que s'explorara l'arbre de posibilitats
+     * @param alpha valor heuristic mes alt trobat fins al moment per fer la poda
+     * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
+     * @return retorna la heuristica mes alta de totes les tirades analitzades
+     */
+    
+    //Descomentar si es vol sense poda
+    //public int maximitza (Tauler t,int profunditat){
     //Comentar si es vol sense poda
-    //public int maximitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
-        if (profunditat <= 0) {
+    public int maximitza (Tauler t,int profunditat,int alpha,int beta){
+        if (profunditat <= 0 || !(t.espotmoure())) {
             return heur(t);
         }
+        
         int nova_alpha = Integer.MIN_VALUE;
         for (int i = 0; i < t.getMida(); i++) {
             if (t.movpossible(i)) {
@@ -87,16 +120,16 @@ public class citroënC4 implements Jugador, IAuto{
                 taulell_aux.afegeix(i, this.color);
                 if (!taulell_aux.solucio(i, this.color)) {
                     //Descomentar si es vol sense poda
-                    nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux,i, profunditat - 1));
+                    //nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux, profunditat - 1));
                     
                     //---Comentar si es vol sense poda-----------------
-                    /*
-                    nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux,i, profunditat - 1, alpha, beta));
+                    
+                    nova_alpha = Math.max(nova_alpha, minimitza(taulell_aux, profunditat - 1, alpha, beta));
                     alpha = Math.max(nova_alpha, alpha);
                     if (alpha >= beta) {
                         return alpha;
                     }
-*/
+
                     //-------------------------------------------------
                 }
                 else {
@@ -106,11 +139,20 @@ public class citroënC4 implements Jugador, IAuto{
         }
         return nova_alpha;
     }
+    
+     /**
+     * Funcion que ens indica l'heuristica mes petita trobada per totes les tirades analitzades.
+     * @param t taulell sobre el que s'esta jugant
+     * @param profunditat profunditat fins la que s'explorara l'arbre de posibilitats
+     * @param alpha valor heuristic mes alt trobat fins al moment per fer la poda
+     * @param beta valor heuristic mes baix trobat fins al moment per fer la poda
+     * @return retorna la heuristica mes baixa de totes les tirades analitzades
+     */
     //Descomentar si es vol sense poda
-    public int minimitza (Tauler t, int columna ,int profunditat){
+    //public int minimitza (Tauler t,int profunditat){
     //Comentar si es vol sense poda
-    //public int minimitza (Tauler t, int columna ,int profunditat,int alpha,int beta){
-        if (profunditat <= 0) {
+    public int minimitza (Tauler t,int profunditat,int alpha,int beta){
+        if (profunditat <= 0 || !(t.espotmoure())) {
             return heur(t);
         }
         int nova_beta = Integer.MAX_VALUE;
@@ -120,16 +162,16 @@ public class citroënC4 implements Jugador, IAuto{
                 taulell_aux.afegeix(i, this.color*-1);
                 if (!taulell_aux.solucio(i, this.color*-1)) {
                     //Descomentar si es vol sense poda
-                    nova_beta = Math.min(nova_beta, maximitza(taulell_aux,i, profunditat - 1));
+                    //nova_beta = Math.min(nova_beta, maximitza(taulell_aux, profunditat - 1));
                     
                     //---Comentar si es vol sense poda-----------------
-                    /*
-                    nova_beta = Math.min(nova_beta, maximitza(taulell_aux,i, profunditat - 1, alpha, beta));
+                    
+                    nova_beta = Math.min(nova_beta, maximitza(taulell_aux, profunditat - 1, alpha, beta));
                     beta = Math.min(nova_beta, beta);
                     if (alpha >= beta) {
                         return beta;
                     }
-*/
+
                     //-------------------------------------------------
                 }
                 else {
@@ -140,22 +182,37 @@ public class citroënC4 implements Jugador, IAuto{
         return nova_beta;
     }
     
-        
+    /**
+     * Funcion que  indica la puntuacion d'una casella segons el color
+     * @param t taulell sobre el que estem jugant
+     * @param i fila 
+     * @param j columna
+     * @param color color de qui esta comprobant les caselles per puntarse
+     * @return retorna 3 si la casella es del mateix color i -1 si la casella es de l'altre color 
+     *         (sempre que la profunditat sigui > 4)
+     */
     public int puntua (Tauler t, int i, int j, int color) {
         int puntuacio = 0;
         if (t.getColor(i, j) != 0) {
             if (t.getColor(i, j) == color) {
-                if (this.prof > 4)
+                //if (this.prof > 4)
                     puntuacio = 3;                
             }
             else {
-                if (this.prof > 4)
+                //if (this.prof > 4)
                     puntuacio = -1;
             }
         }
         return puntuacio;
     }
     
+    /**
+     * Funcio que calcula l'heuristica del taulell combinant l'heuristica del taulell
+     * de probabilitats i explorant les caselles veines de cada ficha
+     * Sumem heuristica si son nostres les fiches i restem si son del contrincant
+     * @param t taulell sobre el que estem jugant
+     * @return retorna la restea del a nostre heuristica menys la del contrincant
+     */
     public int heur(Tauler t) {
         numNodes = numNodes + 1;
         int puntuacio_meva = 0;
@@ -185,6 +242,15 @@ public class citroënC4 implements Jugador, IAuto{
         return puntuacio_meva - puntuacio_enemic;
     }
     
+    /**
+     * Funcion encarregada de visitar les caselles veines en horitzontal
+     * i donar una puntuacio segons el color de cada casella.
+     * @param t taulell sobre el que juguem
+     * @param i fila de la casella que puntuem 
+     * @param j columna de la casella que puntuem
+     * @param color color del jugador que esta puntuan el taulell
+     * @return Retorna la puntuacio de la casella segons el color de les caselles veines en horitzontal
+     */
     public int puntuacio_horitzontal(Tauler t, int i, int j, int color){
         int puntuacio = 0;
         int size = t.getMida();
@@ -199,6 +265,15 @@ public class citroënC4 implements Jugador, IAuto{
         return puntuacio;
     }
     
+     /**
+     * Funcion encarregada de visitar les caselles veines en vertical
+     * i donar una puntuacio segons el color de cada casella.
+     * @param t taulell sobre el que juguem
+     * @param i fila de la casella que puntuem 
+     * @param j columna de la casella que puntuem
+     * @param color color del jugador que esta puntuan el taulell
+     * @return Retorna la puntuacio de la casella segons el color de les caselles veines en vertical
+     */
     public int puntuacio_vertical(Tauler t, int i, int j, int color){
         int puntuacio = 0;
         int size = t.getMida();
@@ -212,6 +287,15 @@ public class citroënC4 implements Jugador, IAuto{
         return puntuacio;
     }
     
+     /**
+     * Funcion encarregada de visitar les caselles veines en a les diagonals superiors
+     * i donar una puntuacio segons el color de cada casella.
+     * @param t taulell sobre el que juguem
+     * @param i fila de la casella que puntuem 
+     * @param j columna de la casella que puntuem
+     * @param color color del jugador que esta puntuan el taulell
+     * @return Retorna la puntuacio de la casella segons el color de les caselles veines en les diagonals superiors
+     */
     public int puntuacio_diagonal(Tauler t, int i, int j, int color){
         int puntuacio = 0;
         int size = t.getMida();
