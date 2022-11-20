@@ -15,6 +15,9 @@ public class citroënC4 implements Jugador, IAuto{
     private int color=1;
     private int prof;
     private int numNodes;
+    private int result_heur;
+    private int heur = 0;
+    private int num_tirades = 0;
     
     public int[][] taula_posibilitat = {
         {3, 4, 5, 7, 7, 5, 4, 3},
@@ -57,6 +60,7 @@ public class citroënC4 implements Jugador, IAuto{
         this.color = color;
         int tirada = nova_tirada(t,prof);
         System.out.println("Nodes total = "+ numNodes);
+        this.num_tirades++;
         return tirada;
     }
      
@@ -67,6 +71,7 @@ public class citroënC4 implements Jugador, IAuto{
      * @return retorna la millor columna on fer la proxima tirada
      */
     public int nova_tirada(Tauler t, int profunditat) {
+        this.heur = 0;
         int millor_heur = Integer.MIN_VALUE;
         int millor_columna = -1;
         for (int i = 0; i < t.getMida(); i++) {
@@ -91,6 +96,8 @@ public class citroënC4 implements Jugador, IAuto{
                 }
             }
          }
+        this.heur += this.result_heur;
+        System.out.println("Heuristica de la tirada "+this.num_tirades+": "+this.heur);
         return millor_columna;
     }
     
@@ -195,11 +202,11 @@ public class citroënC4 implements Jugador, IAuto{
         int puntuacio = 0;
         if (t.getColor(i, j) != 0) {
             if (t.getColor(i, j) == color) {
-                //if (this.prof > 4)
+                //if (this.prof > 4) //proba
                     puntuacio = 3;                
             }
             else {
-                //if (this.prof > 4)
+                //if (this.prof > 4) //proba
                     puntuacio = -1;
             }
         }
@@ -239,6 +246,7 @@ public class citroënC4 implements Jugador, IAuto{
                 }
             }
         }
+        this.result_heur = puntuacio_meva - puntuacio_enemic;
         return puntuacio_meva - puntuacio_enemic;
     }
     
